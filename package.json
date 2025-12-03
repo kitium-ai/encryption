@@ -1,0 +1,40 @@
+{
+  "name": "@kitiumai/encryption",
+  "version": "0.1.0",
+  "description": "Enterprise-ready TypeScript encryption SDK with pluggable providers and secure defaults.",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "module": "dist/index.js",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc --noEmit false",
+    "lint": "eslint \"src/**/*.{ts,tsx}\"",
+    "format": "prettier --write \"src/**/*.{ts,tsx}\"",
+    "test": "vitest run",
+    "check": "npm run lint && npm run test"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^22.5.4",
+    "eslint": "^9.9.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-promise": "^6.2.0",
+    "prettier": "^3.3.3",
+    "typescript": "^5.5.4",
+    "vitest": "^1.6.0",
+    "zod": "^3.23.8"
+  },
+  "dependencies": {
+    "argon2-browser": "^1.19.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
