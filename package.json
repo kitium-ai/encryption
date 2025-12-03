@@ -1,23 +1,71 @@
 {
   "name": "@kitiumai/encryption",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Enterprise-ready TypeScript encryption SDK with pluggable providers and secure defaults.",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "module": "dist/index.js",
+  "sideEffects": false,
   "exports": {
     ".": {
       "import": "./dist/index.js",
       "types": "./dist/index.d.ts"
     }
   },
+  "keywords": [
+    "encryption",
+    "crypto",
+    "aes-gcm",
+    "ed25519",
+    "kms",
+    "key management",
+    "envelope encryption",
+    "argon2",
+    "scrypt",
+    "typescript",
+    "sdk",
+    "security",
+    "webcrypto",
+    "node crypto",
+    "kitium",
+    "kitiumai"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kitium-ai/encryption.git"
+  },
+  "bugs": {
+    "url": "https://github.com/kitium-ai/encryption/issues"
+  },
+  "homepage": "https://github.com/kitium-ai/encryption#readme",
   "scripts": {
     "build": "tsc --noEmit false",
     "lint": "eslint \"src/**/*.{ts,tsx}\"",
     "format": "prettier --write \"src/**/*.{ts,tsx}\"",
     "test": "vitest run",
-    "check": "npm run lint && npm run test"
+    "check": "npm run lint && npm run test",
+    "typecheck": "tsc -b --noEmit",
+    "lint:fix": "eslint . --fix",
+    "lint:all": "node --input-type=module -e \"import { lintAll } from '@kitiumai/scripts/lint'; await lintAll(false);\"",
+    "test:watch": "vitest watch",
+    "test:coverage": "node --input-type=module -e \"import { runTestsCoverage } from '@kitiumai/scripts/test'; await runTestsCoverage();\"",
+    "format:fix": "prettier --write .",
+    "security:audit": "node --input-type=module -e \"import { auditDependencies } from '@kitiumai/scripts/security'; const summary = await auditDependencies({ severityThreshold: 'moderate' }); if ((summary.severityCounts?.critical || 0) + (summary.severityCounts?.high || 0) + (summary.severityCounts?.moderate || 0) > 0) { console.log(JSON.stringify(summary, null, 2)); process.exit(1); } console.log('No blocking vulnerabilities');\"",
+    "security:secrets": "node --input-type=module -e \"import { scanSecrets } from '@kitiumai/scripts/security'; const result = await scanSecrets({ configPath: '.gitleaks.toml', failOnFinding: true }); if (result.findings?.length) { console.error(JSON.stringify(result.findings, null, 2)); process.exit(1); } console.log('No secrets detected');\"",
+    "ci:verify": "pnpm run lint:all && pnpm run test:coverage && pnpm run typecheck",
+    "changeset": "ensure-changeset && changeset",
+    "version": "ensure-changeset && changeset version",
+    "publish:set-token": "set-npm-token",
+    "publish:setup": "set-npm-token",
+    "publish:check": "npm whoami --registry https://registry.npmjs.org || npm login --registry https://registry.npmjs.org",
+    "publish:login": "npm login --registry https://registry.npmjs.org",
+    "publish:package": "pnpm run publish:check && pnpm publish --access public --no-git-checks --registry https://registry.npmjs.org",
+    "publish:package:token": "pnpm run publish:setup && pnpm publish --access public --no-git-checks --registry https://registry.npmjs.org",
+    "publish:package:otp": "pnpm run publish:check && pnpm publish --access public --no-git-checks --registry https://registry.npmjs.org --otp",
+    "publish:dry-run": "pnpm publish --access public --no-git-checks --dry-run --registry https://registry.npmjs.org",
+    "publish:dry-run:token": "pnpm run publish:setup && pnpm publish --access public --no-git-checks --dry-run --registry https://registry.npmjs.org",
+    "release": "pnpm version && pnpm install --lockfile-only"
   },
   "license": "MIT",
   "devDependencies": {
@@ -29,10 +77,14 @@
     "prettier": "^3.3.3",
     "typescript": "^5.5.4",
     "vitest": "^1.6.0",
-    "zod": "^3.23.8"
+    "zod": "^3.23.8",
+    "@kitiumai/vitest-helpers": "^2.0.1",
+    "@kitiumai/lint": "^2.0.1",
+    "@kitiumai/scripts": "^1.0.0",
+    "@kitiumai/config": "^2.0.1"
   },
   "dependencies": {
-    "argon2-browser": "^1.19.0"
+    "argon2-browser": "^1.18.0"
   },
   "engines": {
     "node": ">=18"

@@ -1,7 +1,9 @@
 # Changelog
 
-## [Unreleased]
+## [v1.0.0] - 2025-12-03
+
 ### Added
+
 - Initial enterprise-focused TypeScript SDK with provider abstraction, strict toolchain, and secure defaults.
 - Local provider offering AES-256-GCM encryption, Ed25519 signing, policy enforcement, and audit hooks.
 - Envelope encryption helper, streaming utilities, and ergonomic helper APIs for strings/JSON.

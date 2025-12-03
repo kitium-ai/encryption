@@ -12,14 +12,19 @@ export interface StreamingOptions {
   algorithm?: Algorithm;
 }
 
-export function createEncryptionStream(options: StreamingOptions): { stream: Transform; iv: Uint8Array } {
+export function createEncryptionStream(options: StreamingOptions): {
+  stream: Transform;
+  iv: Uint8Array;
+} {
   const algorithm = options.algorithm ?? 'AES-256-GCM';
   if (!SUPPORTED.includes(algorithm)) {
     throw new Error(`Unsupported streaming algorithm ${algorithm}`);
   }
   const iv = options.iv ?? randomBytes(12);
   const cipher = createCipheriv('aes-256-gcm', options.key, iv);
-  if (options.additionalData) cipher.setAAD(Buffer.from(options.additionalData));
+  if (options.additionalData) {
+    cipher.setAAD(Buffer.from(options.additionalData));
+  }
   const stream = new Transform({
     transform(chunk, _encoding, callback) {
       try {
@@ -44,13 +49,17 @@ export function createEncryptionStream(options: StreamingOptions): { stream: Tra
   return { stream, iv };
 }
 
-export function createDecryptionStream(options: StreamingOptions & { authTag: Uint8Array }): Transform {
+export function createDecryptionStream(
+  options: StreamingOptions & { authTag: Uint8Array }
+): Transform {
   const algorithm = options.algorithm ?? 'AES-256-GCM';
   if (!SUPPORTED.includes(algorithm)) {
     throw new Error(`Unsupported streaming algorithm ${algorithm}`);
   }
   const decipher = createDecipheriv('aes-256-gcm', options.key, options.iv ?? randomBytes(12));
-  if (options.additionalData) decipher.setAAD(Buffer.from(options.additionalData));
+  if (options.additionalData) {
+    decipher.setAAD(Buffer.from(options.additionalData));
+  }
   decipher.setAuthTag(Buffer.from(options.authTag));
   return new Transform({
     transform(chunk, _encoding, callback) {

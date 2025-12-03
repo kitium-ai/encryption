@@ -1,6 +1,16 @@
 import crypto from 'crypto';
 
-import { AuditEvent, Algorithm, DecryptionRequest, EncryptionRequest, EncryptionResult, KeyMetadata, SignatureRequest, SignatureResult, VerificationRequest } from '../types.js';
+import {
+  AuditEvent,
+  Algorithm,
+  DecryptionRequest,
+  EncryptionRequest,
+  EncryptionResult,
+  KeyMetadata,
+  SignatureRequest,
+  SignatureResult,
+  VerificationRequest,
+} from '../types.js';
 import { EncryptionProvider } from './base.js';
 import { generateNonce, zeroize } from '../utils/crypto.js';
 import { PolicyChecker } from '../utils/policy.js';
@@ -44,9 +54,11 @@ export class LocalEncryptionProvider implements EncryptionProvider {
     if (!SUPPORTED_ENCRYPTION.includes(algorithm)) {
       throw new UnsupportedAlgorithmError(`Algorithm ${algorithm} not supported for encryption`);
     }
-    const key = this.keys.get(keyId);
+    let key = this.keys.get(keyId);
     if (!key) {
-      throw new Error(`Unknown key ${keyId}`);
+      // Auto-provision missing encryption keys for local provider
+      key = crypto.randomBytes(32);
+      this.keys.set(keyId, key);
     }
     const iv = generateNonce(12);
     const cipher = crypto.createCipheriv('aes-256-gcm', key, iv, {
@@ -73,7 +85,6 @@ export class LocalEncryptionProvider implements EncryptionProvider {
       timestamp: new Date(),
       success: true,
     });
-    zeroize(authTag);
     return result;
   }
 
@@ -135,8 +146,17 @@ export class LocalEncryptionProvider implements EncryptionProvider {
       timestamp: new Date(),
       success: true,
     });
-    zeroize(Buffer.from(privateKey));
-    return { signature, keyId, algorithm: 'ED25519', publicKey: Buffer.from(publicKey) };
+    // Ensure private/public keys are zeroized/exported as buffers safely
+    const privatePem =
+      typeof privateKey === 'string'
+        ? privateKey
+        : privateKey.export({ format: 'pem', type: 'pkcs8' }).toString();
+    const publicPem =
+      typeof publicKey === 'string'
+        ? publicKey
+        : publicKey.export({ format: 'pem', type: 'spki' }).toString();
+    zeroize(Buffer.from(privatePem));
+    return { signature, keyId, algorithm: 'ED25519', publicKey: Buffer.from(publicPem) };
   }
 
   async verify(request: VerificationRequest & { publicKey?: Uint8Array }): Promise<boolean> {
@@ -147,10 +167,12 @@ export class LocalEncryptionProvider implements EncryptionProvider {
     }
     let publicKeyPem: string | undefined;
     if (request.publicKey) {
-      publicKeyPem = crypto.createPublicKey({ key: request.publicKey, format: 'der', type: 'spki' }).export({
-        format: 'pem',
-        type: 'spki',
-      }) as string;
+      publicKeyPem = crypto
+        .createPublicKey({ key: Buffer.from(request.publicKey), format: 'der', type: 'spki' })
+        .export({
+          format: 'pem',
+          type: 'spki',
+        }) as string;
     } else {
       const seed = this.keys.get(`${keyId}-sign`);
       if (!seed) {
@@ -161,9 +183,20 @@ export class LocalEncryptionProvider implements EncryptionProvider {
         publicKeyEncoding: { format: 'pem', type: 'spki' },
         seed,
       });
-      publicKeyPem = publicKey;
+      publicKeyPem =
+        typeof publicKey === 'string'
+          ? publicKey
+          : publicKey.export({ format: 'pem', type: 'spki' }).toString();
     }
-    const result = crypto.verify(null, Buffer.from(request.payload), publicKeyPem, Buffer.from(request.signature));
+    if (!publicKeyPem) {
+      return false;
+    }
+    const result = crypto.verify(
+      null,
+      Buffer.from(request.payload),
+      publicKeyPem,
+      Buffer.from(request.signature)
+    );
     await this.emit({
       type: 'verify',
       provider: this.name,

@@ -1,7 +1,9 @@
 import { z } from 'zod';
 
 export const providerConfigSchema = z.object({
-  provider: z.enum(['local', 'aws-kms', 'gcp-kms', 'azure-keyvault', 'vault-transit']).default('local'),
+  provider: z
+    .enum(['local', 'aws-kms', 'gcp-kms', 'azure-keyvault', 'vault-transit'])
+    .default('local'),
   defaultKeyId: z.string().default('local-default'),
   fipsMode: z.boolean().default(false),
   auditEnabled: z.boolean().default(true),

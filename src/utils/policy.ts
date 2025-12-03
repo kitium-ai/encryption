@@ -10,13 +10,22 @@ export interface PolicyRule {
 export class PolicyChecker {
   constructor(private readonly rules: PolicyRule[] = []) {}
 
-  enforce(action: PolicyRule['action'], context: { keyId?: string; algorithm?: string; createdAt?: Date }) {
+  enforce(
+    action: PolicyRule['action'],
+    context: { keyId?: string; algorithm?: string; createdAt?: Date }
+  ) {
     for (const rule of this.rules) {
-      if (rule.action !== action) continue;
+      if (rule.action !== action) {
+        continue;
+      }
       if (rule.allowedKeyIds && context.keyId && !rule.allowedKeyIds.includes(context.keyId)) {
         throw new PolicyViolationError(`Key ${context.keyId} is not allowed for ${action}`);
       }
-      if (rule.allowedAlgorithms && context.algorithm && !rule.allowedAlgorithms.includes(context.algorithm)) {
+      if (
+        rule.allowedAlgorithms &&
+        context.algorithm &&
+        !rule.allowedAlgorithms.includes(context.algorithm)
+      ) {
         throw new PolicyViolationError(`Algorithm ${context.algorithm} not allowed for ${action}`);
       }
       if (rule.maxAgeMs && context.createdAt) {

@@ -2,7 +2,16 @@ import { setTimeout as delay } from 'timers/promises';
 
 import { EncryptionProvider } from './base.js';
 import { LocalEncryptionProvider } from './local.js';
-import { DecryptionRequest, EncryptionRequest, EncryptionResult, HealthCheck, KeyMetadata, SignatureRequest, SignatureResult, VerificationRequest } from '../types.js';
+import {
+  DecryptionRequest,
+  EncryptionRequest,
+  EncryptionResult,
+  HealthCheck,
+  KeyMetadata,
+  SignatureRequest,
+  SignatureResult,
+  VerificationRequest,
+} from '../types.js';
 
 export type KmsFlavor = 'aws-kms' | 'gcp-kms' | 'azure-keyvault' | 'vault-transit';
 
@@ -33,7 +42,7 @@ export class GenericKmsProvider implements EncryptionProvider {
 
   async decrypt(request: DecryptionRequest): Promise<Uint8Array> {
     await this.jitter();
-    return this.local.decrypt(request as EncryptionRequest & { iv: Uint8Array; authTag?: Uint8Array });
+    return this.local.decrypt(request);
   }
 
   async sign(request: SignatureRequest): Promise<SignatureResult> {
@@ -46,9 +55,9 @@ export class GenericKmsProvider implements EncryptionProvider {
     return this.local.verify(request);
   }
 
-  async generateKey(algorithm?: string): Promise<KeyMetadata> {
+  async generateKey(): Promise<KeyMetadata> {
     await this.jitter();
-    const meta = await this.local.generateKey(algorithm);
+    const meta = await this.local.generateKey();
     return { ...meta, managedBy: this.name as KeyMetadata['managedBy'] };
   }
 
@@ -66,6 +75,11 @@ export class GenericKmsProvider implements EncryptionProvider {
 
   async healthCheck(): Promise<HealthCheck> {
     await this.jitter();
-    return { provider: this.name, healthy: true, latencyMs: this.latencyMs, details: `${this.name} emulated` };
+    return {
+      provider: this.name,
+      healthy: true,
+      latencyMs: this.latencyMs,
+      details: `${this.name} emulated`,
+    };
   }
 }

@@ -36,7 +36,7 @@ export class CompositeAuditSink implements AuditSink {
         } catch (err) {
           errors.push(err as Error);
         }
-      }),
+      })
     );
     if (errors.length > 0) {
       throw new AuditSinkError(`Audit sink failures: ${errors.map((e) => e.message).join(', ')}`);

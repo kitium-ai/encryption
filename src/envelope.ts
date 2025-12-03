@@ -17,13 +17,18 @@ export class EnvelopeEncrypter {
   private readonly cache = new Map<string, CachedDataKey>();
   private readonly dataKeyTtlMs: number;
 
-  constructor(private readonly provider: EncryptionProvider, options: EnvelopeOptions = {}) {
+  constructor(
+    private readonly provider: EncryptionProvider,
+    options: EnvelopeOptions = {}
+  ) {
     this.dataKeyTtlMs = options.dataKeyTtlMs ?? 5 * 60 * 1000;
   }
 
   private getCached(keyId: string): Uint8Array | undefined {
     const cached = this.cache.get(keyId);
-    if (!cached) return undefined;
+    if (!cached) {
+      return undefined;
+    }
     if (cached.expiresAt < Date.now()) {
       this.cache.delete(keyId);
       return undefined;
@@ -35,7 +40,9 @@ export class EnvelopeEncrypter {
     this.cache.set(keyId, { key, expiresAt: Date.now() + this.dataKeyTtlMs });
   }
 
-  async encrypt(request: EncryptionRequest): Promise<EncryptionResult & { wrappedDataKey: EncryptionResult }> {
+  async encrypt(
+    request: EncryptionRequest
+  ): Promise<EncryptionResult & { wrappedDataKey: EncryptionResult }> {
     const keyId = request.keyId ?? 'envelope-master';
     let dataKey = this.getCached(keyId);
     if (!dataKey) {
@@ -69,7 +76,9 @@ export class EnvelopeEncrypter {
     };
   }
 
-  async decrypt(payload: EncryptionResult & { wrappedDataKey: EncryptionResult }): Promise<Uint8Array> {
+  async decrypt(
+    payload: EncryptionResult & { wrappedDataKey: EncryptionResult }
+  ): Promise<Uint8Array> {
     const dataKey = await this.provider.decrypt({
       ciphertext: payload.wrappedDataKey.ciphertext,
       iv: payload.wrappedDataKey.iv,
