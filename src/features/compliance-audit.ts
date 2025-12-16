@@ -51,23 +51,25 @@ export class ComplianceAuditLogger {
     let results = [...this.auditLog];
 
     if (filter.startDate) {
-      results = results.filter((e) => e.timestamp >= filter.startDate!);
+      const startDate = filter.startDate;
+      results = results.filter((event) => event.timestamp >= startDate);
     }
 
     if (filter.endDate) {
-      results = results.filter((e) => e.timestamp <= filter.endDate!);
+      const endDate = filter.endDate;
+      results = results.filter((event) => event.timestamp <= endDate);
     }
 
     if (filter.eventType) {
-      results = results.filter((e) => e.type === filter.eventType);
+      results = results.filter((event) => event.type === filter.eventType);
     }
 
     if (filter.keyId) {
-      results = results.filter((e) => e.keyId === filter.keyId);
+      results = results.filter((event) => event.keyId === filter.keyId);
     }
 
     if (filter.success !== undefined) {
-      results = results.filter((e) => e.success === filter.success);
+      results = results.filter((event) => event.success === filter.success);
     }
 
     if (filter.limit) {
@@ -132,14 +134,14 @@ export class ComplianceAuditLogger {
           'correlationId',
           'metadata',
         ];
-        const rows = logs.map((e) => [
-          e.timestamp.toISOString(),
-          e.type,
-          e.provider,
-          e.keyId || '',
-          e.success ? 'true' : 'false',
-          e.correlationId || '',
-          JSON.stringify(e.metadata || {}),
+        const rows = logs.map((event) => [
+          event.timestamp.toISOString(),
+          event.type,
+          event.provider,
+          event.keyId ?? '',
+          event.success ? 'true' : 'false',
+          event.correlationId ?? '',
+          JSON.stringify(event.metadata ?? {}),
         ]);
 
         return [
@@ -168,7 +170,7 @@ export class ComplianceAuditLogger {
 
     for (const event of logs) {
       if (!event.success && event.keyId) {
-        const count = (failuresByKey.get(event.keyId) || 0) + 1;
+        const count = (failuresByKey.get(event.keyId) ?? 0) + 1;
         failuresByKey.set(event.keyId, count);
 
         // Flag if more than 5 consecutive failures

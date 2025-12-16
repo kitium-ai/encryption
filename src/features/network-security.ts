@@ -61,7 +61,8 @@ export class NetworkSecurityManager {
   private isCIDRMatch(ip: string, cidrs: string[]): boolean {
     // Simplified CIDR matching - in production use a proper IP library
     for (const cidr of cidrs) {
-      if (cidr === '*' || ip.startsWith(cidr.split('/')[0])) {
+      const cidrPrefix = cidr.split('/')[0];
+      if (cidr === '*' || (cidrPrefix && ip.startsWith(cidrPrefix))) {
         return true;
       }
     }
@@ -131,16 +132,16 @@ export class NetworkSecurityManager {
     action: string,
     resource: string
   ): boolean {
-    const principalMatches =
+    const isPrincipalMatch =
       policy.principal === '*' || policy.principal === principal;
-    const actionMatches = policy.action.some(
+    const isActionMatch = policy.action.some(
       (a) => a === '*' || a === action
     );
-    const resourceMatches = policy.resource.some(
+    const isResourceMatch = policy.resource.some(
       (r) => r === '*' || r === resource
     );
 
-    return principalMatches && actionMatches && resourceMatches;
+    return isPrincipalMatch && isActionMatch && isResourceMatch;
   }
 
   /**

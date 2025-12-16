@@ -36,8 +36,12 @@ export class LocalEncryptionProvider implements EncryptionProvider {
 
   constructor(options: LocalProviderOptions = {}) {
     this.encryptionKeyId = options.defaultEncryptionKeyId ?? 'local-default';
-    this.auditSink = options.auditSink;
-    this.policyChecker = options.policyChecker;
+    if (options.auditSink !== undefined) {
+      this.auditSink = options.auditSink;
+    }
+    if (options.policyChecker !== undefined) {
+      this.policyChecker = options.policyChecker;
+    }
     if (!this.keys.has(this.encryptionKeyId)) {
       this.keys.set(this.encryptionKeyId, crypto.randomBytes(32));
     }
@@ -77,8 +81,10 @@ export class LocalEncryptionProvider implements EncryptionProvider {
       authTag,
       keyId,
       algorithm,
-      additionalData: request.additionalData,
     };
+    if (request.additionalData !== undefined) {
+      result.additionalData = request.additionalData;
+    }
     await this.emit({
       type: 'encrypt',
       provider: this.name,

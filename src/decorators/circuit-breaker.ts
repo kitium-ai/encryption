@@ -1,6 +1,9 @@
 import { CircuitBreakerOpenError } from '../errors.js';
-import type { HealthCheck,HealthMonitoring } from '../interfaces/core.js';
+import type { HealthCheck, HealthMonitoring } from '../interfaces/core.js';
 import { HealthMonitoringDecorator } from './base.js';
+
+// Re-export HealthCheck for convenience
+export type { HealthCheck };
 
 /**
  * Circuit breaker configuration
@@ -44,7 +47,7 @@ export class CircuitBreakerHealthMonitoring extends HealthMonitoringDecorator {
     super(wrapped);
   }
 
-  async healthCheck(): Promise<HealthCheck> {
+  override async healthCheck(): Promise<HealthCheck> {
     const now = Date.now();
 
     // Circuit is OPEN - reject immediately without calling wrapped provider

@@ -32,6 +32,7 @@ export class MultiRegionKeyManager {
   /**
    * Replicate key to region
    */
+  // eslint-disable-next-line @typescript-eslint/require-await, require-await -- Placeholder for future async implementation
   async replicateKey(
     keyId: string,
     targetRegion: string
@@ -55,7 +56,10 @@ export class MultiRegionKeyManager {
         isSynced: true,
       };
 
-      this.regionalStates.get(keyId)!.push(state);
+      const states = this.regionalStates.get(keyId);
+      if (states) {
+        states.push(state);
+      }
 
       this.replicationLog.push({
         timestamp: new Date(),
@@ -66,7 +70,7 @@ export class MultiRegionKeyManager {
       });
 
       return true;
-    } catch (error) {
+    } catch {
       this.replicationLog.push({
         timestamp: new Date(),
         keyId,
@@ -86,8 +90,8 @@ export class MultiRegionKeyManager {
     const results = new Map<string, boolean>();
 
     for (const region of this.config.replicaRegions) {
-      const success = await this.replicateKey(keyId, region);
-      results.set(region, success);
+      const isSuccessful = await this.replicateKey(keyId, region);
+      results.set(region, isSuccessful);
     }
 
     return results;
@@ -121,6 +125,7 @@ export class MultiRegionKeyManager {
   /**
    * Promote replica region to primary
    */
+  // eslint-disable-next-line @typescript-eslint/require-await, require-await -- Placeholder for future async implementation
   async promoteRegion(newPrimaryRegion: string): Promise<boolean> {
     if (!this.config.replicaRegions.includes(newPrimaryRegion)) {
       return false;
@@ -194,6 +199,7 @@ export class MultiRegionKeyManager {
   /**
    * Resync key to region
    */
+  // eslint-disable-next-line @typescript-eslint/require-await, require-await -- Placeholder for future async implementation
   async resyncKeyToRegion(keyId: string, region: string): Promise<boolean> {
     const state = this.getRegionalState(keyId, region);
     if (!state) {

@@ -1,4 +1,5 @@
-import type { EncryptionProvider, KeyMetadata } from '../types.js';
+import type { EncryptionProvider } from '../interfaces/core.js';
+import type { KeyMetadata } from '../types.js';
 
 export type KeyRotationPolicy = {
   autoRotateEnabled: boolean;

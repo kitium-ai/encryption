@@ -3,6 +3,9 @@ export * from './interfaces/adapter.js';
 export * from './interfaces/core.js';
 export * from './types.js';
 
+// Explicitly re-export EncryptionProvider to avoid ambiguity
+export type { EncryptionProvider } from './interfaces/core.js';
+
 // Providers
 export * from './providers/base.js';
 export * from './providers/genericKms.js';

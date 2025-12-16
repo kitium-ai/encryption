@@ -1,4 +1,7 @@
-import type { HealthCheck,HealthMonitoring } from '../../interfaces/core.js';
+import type { HealthCheck, HealthMonitoring } from '../../interfaces/core.js';
+
+// Re-export for convenience
+export type { HealthCheck };
 
 /**
  * Local health monitoring implementation

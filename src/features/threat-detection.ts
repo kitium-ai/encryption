@@ -45,7 +45,10 @@ export class ThreatDetectionEngine {
    * Detect repeated failure patterns
    */
   private detectFailurePattern(event: AuditEvent): ThreatAlert | null {
-    const keyId = event.keyId!;
+    const keyId = event.keyId;
+    if (!keyId) {
+      return null;
+    }
     const now = Date.now();
     const windowMs = this.config.timeWindowSeconds * 1000;
 
@@ -53,7 +56,10 @@ export class ThreatDetectionEngine {
       this.failurePatterns.set(keyId, []);
     }
 
-    const timestamps = this.failurePatterns.get(keyId)!;
+    const timestamps = this.failurePatterns.get(keyId);
+    if (!timestamps) {
+      return null;
+    }
 
     // Remove old timestamps outside window
     const recentTimestamps = timestamps.filter(

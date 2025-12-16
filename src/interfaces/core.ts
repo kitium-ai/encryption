@@ -1,4 +1,5 @@
 import type {
+  AuditEvent,
   DecryptionRequest,
   EncryptionRequest,
   EncryptionResult,
@@ -8,6 +9,9 @@ import type {
   SignatureResult,
   VerificationRequest,
 } from '../types.js';
+
+// Re-export for convenience
+export type { AuditEvent, HealthCheck };
 
 /**
  * Request context for correlation tracking and metadata
@@ -97,3 +101,6 @@ export type Auditable = {
  * @deprecated Use segregated interfaces instead (CryptoOperations, SignatureOperations, KeyManagement, HealthMonitoring)
  */
 export type EncryptionProviderCompat = CryptoOperations & SignatureOperations & KeyManagement & HealthMonitoring;
+
+// Legacy alias for backward compatibility
+export type EncryptionProvider = EncryptionProviderCompat;

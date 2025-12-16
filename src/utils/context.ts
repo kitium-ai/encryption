@@ -26,9 +26,12 @@ export class ContextManager {
   ): OperationContext {
     const context: OperationContext = {
       correlationId: correlationId ?? crypto.randomUUID(),
-      metadata,
       timestamp: new Date(),
     };
+
+    if (metadata !== undefined) {
+      context.metadata = metadata;
+    }
 
     this.contexts.set(context.correlationId, context);
     return context;

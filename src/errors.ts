@@ -14,8 +14,12 @@ export class EncryptionError extends Error {
   ) {
     super(message);
     this.code = code;
-    this.correlationId = context?.correlationId;
-    this.context = context;
+    if (context?.correlationId !== undefined) {
+      this.correlationId = context.correlationId;
+    }
+    if (context !== undefined) {
+      this.context = context;
+    }
     this.name = 'EncryptionError';
   }
 }

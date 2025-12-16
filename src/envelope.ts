@@ -48,12 +48,15 @@ export class EnvelopeEncrypter {
       this.cache.set(cacheKey, dataKey);
     }
 
-    const wrappedDataKey = await this.provider.encrypt({
+    const encryptRequest: EncryptionRequest = {
       plaintext: dataKey,
       keyId,
       algorithm: AES_256_GCM,
-      additionalData: request.additionalData,
-    });
+    };
+    if (request.additionalData !== undefined) {
+      encryptRequest.additionalData = request.additionalData;
+    }
+    const wrappedDataKey = await this.provider.encrypt(encryptRequest);
 
     const iv = randomBytes(12);
     const cipher = crypto.createCipheriv('aes-256-gcm', dataKey, iv);
@@ -63,15 +66,18 @@ export class EnvelopeEncrypter {
     const ciphertext = Buffer.concat([cipher.update(request.plaintext), cipher.final()]);
     const authTag = cipher.getAuthTag();
 
-    return {
+    const result: EncryptionResult & { wrappedDataKey: EncryptionResult } = {
       ciphertext,
       iv,
       authTag,
       keyId,
       algorithm: AES_256_GCM,
-      additionalData: request.additionalData,
       wrappedDataKey,
     };
+    if (request.additionalData !== undefined) {
+      result.additionalData = request.additionalData;
+    }
+    return result;
   }
 
   async decrypt(

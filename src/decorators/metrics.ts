@@ -59,11 +59,11 @@ export class InstrumentedCryptoOperations extends CryptoOperationsDecorator {
     super(wrapped);
   }
 
-  encrypt(request: EncryptionRequest & RequestContext): Promise<EncryptionResult> {
+  override encrypt(request: EncryptionRequest & RequestContext): Promise<EncryptionResult> {
     return measureLatency('encrypt', () => super.encrypt(request), this.metrics);
   }
 
-  decrypt(request: DecryptionRequest & RequestContext): Promise<Uint8Array> {
+  override decrypt(request: DecryptionRequest & RequestContext): Promise<Uint8Array> {
     return measureLatency('decrypt', () => super.decrypt(request), this.metrics);
   }
 }
@@ -80,11 +80,11 @@ export class InstrumentedSignatureOperations extends SignatureOperationsDecorato
     super(wrapped);
   }
 
-  sign(request: SignatureRequest & RequestContext): Promise<SignatureResult> {
+  override sign(request: SignatureRequest & RequestContext): Promise<SignatureResult> {
     return measureLatency('sign', () => super.sign(request), this.metrics);
   }
 
-  verify(request: VerificationRequest & RequestContext): Promise<boolean> {
+  override verify(request: VerificationRequest & RequestContext): Promise<boolean> {
     return measureLatency('verify', () => super.verify(request), this.metrics);
   }
 }

@@ -50,7 +50,7 @@ async function withRetry<T>(
 
       // Check if error is retryable
       const isRetryable =
-        config.retryableErrors?.some((code) => (error as Record<string, unknown>).code === code) ?? true;
+        config.retryableErrors?.some((code) => (error as Record<string, unknown>)['code'] === code) ?? true;
 
       if (!isRetryable || attempt === config.maxAttempts) {
         throw lastError;
@@ -61,9 +61,8 @@ async function withRetry<T>(
     }
   }
 
-  if (lastError) {
-    throw lastError;
-  }
+  // This should never be reached, but TypeScript requires it
+  throw lastError ?? new Error('Retry operation failed without error');
 }
 
 /**
@@ -78,11 +77,11 @@ export class RetryableCryptoOperations extends CryptoOperationsDecorator {
     super(wrapped);
   }
 
-  encrypt(request: EncryptionRequest & RequestContext): Promise<EncryptionResult> {
+  override encrypt(request: EncryptionRequest & RequestContext): Promise<EncryptionResult> {
     return withRetry(() => super.encrypt(request), this.config);
   }
 
-  decrypt(request: DecryptionRequest & RequestContext): Promise<Uint8Array> {
+  override decrypt(request: DecryptionRequest & RequestContext): Promise<Uint8Array> {
     return withRetry(() => super.decrypt(request), this.config);
   }
 }
@@ -99,11 +98,11 @@ export class RetryableSignatureOperations extends SignatureOperationsDecorator {
     super(wrapped);
   }
 
-  sign(request: SignatureRequest & RequestContext): Promise<SignatureResult> {
+  override sign(request: SignatureRequest & RequestContext): Promise<SignatureResult> {
     return withRetry(() => super.sign(request), this.config);
   }
 
-  verify(request: VerificationRequest & RequestContext): Promise<boolean> {
+  override verify(request: VerificationRequest & RequestContext): Promise<boolean> {
     return withRetry(() => super.verify(request), this.config);
   }
 }

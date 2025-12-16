@@ -26,6 +26,7 @@ export class BackupRecoveryManager {
   /**
    * Create encrypted backup
    */
+  // eslint-disable-next-line @typescript-eslint/require-await, require-await -- Placeholder for future async implementation
   async createBackup(
     keys: Array<{ keyId: string; material: Uint8Array }>
   ): Promise<BackupMetadata> {
@@ -75,6 +76,7 @@ export class BackupRecoveryManager {
   /**
    * Verify backup integrity
    */
+  // eslint-disable-next-line @typescript-eslint/require-await, require-await -- Placeholder for future async implementation
   async verifyBackupIntegrity(
     backupId: string,
     expectedChecksum: string
@@ -91,6 +93,7 @@ export class BackupRecoveryManager {
   /**
    * Restore from backup
    */
+  // eslint-disable-next-line @typescript-eslint/require-await, require-await -- Placeholder for future async implementation
   async restoreFromBackup(
     backupId: string
   ): Promise<Array<{ keyId: string; material: Uint8Array }>> {
@@ -172,11 +175,31 @@ export class BackupRecoveryManager {
       (a, b) => a.timestamp.getTime() - b.timestamp.getTime()
     );
 
+    if (sorted.length === 0) {
+      return {
+        totalBackups: 0,
+        totalBackupSize: 0,
+        oldestBackup: new Date(),
+        newestBackup: new Date(),
+      };
+    }
+
+    const oldestBackup = sorted[0];
+    const newestBackup = sorted[sorted.length - 1];
+    if (!oldestBackup || !newestBackup) {
+      return {
+        totalBackups: 0,
+        totalBackupSize: 0,
+        oldestBackup: new Date(),
+        newestBackup: new Date(),
+      };
+    }
+
     return {
       totalBackups: backups.length,
       totalBackupSize: totalSize,
-      oldestBackup: sorted[0].timestamp,
-      newestBackup: sorted[sorted.length - 1].timestamp,
+      oldestBackup: oldestBackup.timestamp,
+      newestBackup: newestBackup.timestamp,
     };
   }
 }

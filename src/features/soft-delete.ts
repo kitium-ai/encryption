@@ -1,4 +1,4 @@
-import type { EncryptionProvider, KeyMetadata } from '../types.js';
+import type { KeyMetadata } from '../types.js';
 
 export type SoftDeleteOptions = {
   retentionDays: number;
@@ -25,6 +25,7 @@ export class KeySoftDeleteManager {
   /**
    * Soft delete a key (recoverable within retention period)
    */
+  // eslint-disable-next-line @typescript-eslint/require-await, require-await -- Placeholder for future async implementation
   async softDeleteKey(keyId: string, metadata: KeyMetadata): Promise<void> {
     const now = new Date();
     const recoverableUntil = new Date(
@@ -58,6 +59,7 @@ export class KeySoftDeleteManager {
   /**
    * Recover a soft-deleted key
    */
+  // eslint-disable-next-line @typescript-eslint/require-await, require-await -- Placeholder for future async implementation
   async recoverKey(keyId: string): Promise<KeyMetadata> {
     if (!this.canRecover(keyId)) {
       throw new Error(
@@ -77,6 +79,7 @@ export class KeySoftDeleteManager {
   /**
    * Permanently purge a soft-deleted key
    */
+  // eslint-disable-next-line @typescript-eslint/require-await, require-await -- Placeholder for future async implementation
   async purgeKey(keyId: string): Promise<void> {
     if (this.purgeProtectedKeys.has(keyId)) {
       throw new Error(

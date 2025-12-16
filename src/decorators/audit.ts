@@ -23,15 +23,24 @@ function createAuditEvent(
   success: boolean,
   correlationId?: string
 ): AuditEvent {
-  return {
+  const event: AuditEvent = {
     type,
     provider,
-    keyId,
-    metadata: algorithm ? { algorithm } : undefined,
     timestamp: new Date(),
     success,
-    correlationId,
   };
+
+  if (keyId !== undefined) {
+    event.keyId = keyId;
+  }
+  if (algorithm !== undefined) {
+    event.metadata = { algorithm };
+  }
+  if (correlationId !== undefined) {
+    event.correlationId = correlationId;
+  }
+
+  return event;
 }
 
 /**
@@ -48,7 +57,7 @@ export class AuditedCryptoOperations extends CryptoOperationsDecorator {
     super(wrapped);
   }
 
-  async encrypt(request: EncryptionRequest & RequestContext): Promise<EncryptionResult> {
+  override async encrypt(request: EncryptionRequest & RequestContext): Promise<EncryptionResult> {
     try {
       const result = await super.encrypt(request);
       await this.emitter(
@@ -77,7 +86,7 @@ export class AuditedCryptoOperations extends CryptoOperationsDecorator {
     }
   }
 
-  async decrypt(request: DecryptionRequest & RequestContext): Promise<Uint8Array> {
+  override async decrypt(request: DecryptionRequest & RequestContext): Promise<Uint8Array> {
     try {
       const result = await super.decrypt(request);
       await this.emitter(
@@ -120,7 +129,7 @@ export class AuditedSignatureOperations extends SignatureOperationsDecorator {
     super(wrapped);
   }
 
-  async sign(request: SignatureRequest & RequestContext): Promise<SignatureResult> {
+  override async sign(request: SignatureRequest & RequestContext): Promise<SignatureResult> {
     try {
       const result = await super.sign(request);
       await this.emitter(
@@ -149,7 +158,7 @@ export class AuditedSignatureOperations extends SignatureOperationsDecorator {
     }
   }
 
-  async verify(request: VerificationRequest & RequestContext): Promise<boolean> {
+  override async verify(request: VerificationRequest & RequestContext): Promise<boolean> {
     try {
       const isValid = await super.verify(request);
       await this.emitter(

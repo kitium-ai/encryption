@@ -24,21 +24,23 @@ export class PolicyEnforcedCryptoOperations extends CryptoOperationsDecorator {
     super(wrapped);
   }
 
-  encrypt(request: EncryptionRequest & RequestContext): Promise<EncryptionResult> {
+  override encrypt(request: EncryptionRequest & RequestContext): Promise<EncryptionResult> {
     const keyId = request.keyId ?? this.defaultKeyId;
-    this.policyChecker.enforce('encrypt', {
-      keyId,
-      algorithm: request.algorithm,
-    });
+    const policyData: { keyId: string; algorithm?: string; createdAt?: Date } = { keyId };
+    if (request.algorithm !== undefined) {
+      policyData.algorithm = request.algorithm;
+    }
+    this.policyChecker.enforce('encrypt', policyData);
     return super.encrypt(request);
   }
 
-  decrypt(request: DecryptionRequest & RequestContext): Promise<Uint8Array> {
+  override decrypt(request: DecryptionRequest & RequestContext): Promise<Uint8Array> {
     const keyId = request.keyId ?? this.defaultKeyId;
-    this.policyChecker.enforce('decrypt', {
-      keyId,
-      algorithm: request.algorithm,
-    });
+    const policyData: { keyId: string; algorithm?: string; createdAt?: Date } = { keyId };
+    if (request.algorithm !== undefined) {
+      policyData.algorithm = request.algorithm;
+    }
+    this.policyChecker.enforce('decrypt', policyData);
     return super.decrypt(request);
   }
 }
@@ -56,21 +58,23 @@ export class PolicyEnforcedSignatureOperations extends SignatureOperationsDecora
     super(wrapped);
   }
 
-  sign(request: SignatureRequest & RequestContext): Promise<SignatureResult> {
+  override sign(request: SignatureRequest & RequestContext): Promise<SignatureResult> {
     const keyId = request.keyId ?? this.defaultKeyId;
-    this.policyChecker.enforce('sign', {
-      keyId,
-      algorithm: request.algorithm,
-    });
+    const policyData: { keyId: string; algorithm?: string; createdAt?: Date } = { keyId };
+    if (request.algorithm !== undefined) {
+      policyData.algorithm = request.algorithm;
+    }
+    this.policyChecker.enforce('sign', policyData);
     return super.sign(request);
   }
 
-  verify(request: VerificationRequest & RequestContext): Promise<boolean> {
+  override verify(request: VerificationRequest & RequestContext): Promise<boolean> {
     const keyId = request.keyId ?? this.defaultKeyId;
-    this.policyChecker.enforce('verify', {
-      keyId,
-      algorithm: request.algorithm,
-    });
+    const policyData: { keyId: string; algorithm?: string; createdAt?: Date } = { keyId };
+    if (request.algorithm !== undefined) {
+      policyData.algorithm = request.algorithm;
+    }
+    this.policyChecker.enforce('verify', policyData);
     return super.verify(request);
   }
 }

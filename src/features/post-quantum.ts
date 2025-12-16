@@ -15,6 +15,7 @@ export class PostQuantumProvider {
   /**
    * Generate ML-KEM encapsulation (key agreement)
    */
+  // eslint-disable-next-line @typescript-eslint/require-await, require-await -- Placeholder for future async implementation
   async generateMLKEMKeyPair(): Promise<QuantumResistantKeyPair> {
     // Placeholder: In production, use liboqs or similar library
     // ML-KEM (Module-Lattice-Based Key-Encapsulation Mechanism)
@@ -29,8 +30,9 @@ export class PostQuantumProvider {
   /**
    * Encapsulate with ML-KEM public key
    */
+  // eslint-disable-next-line @typescript-eslint/require-await, require-await -- Placeholder for future async implementation
   async mlkemEncapsulate(
-    publicKey: Uint8Array
+    _publicKey: Uint8Array
   ): Promise<{ sharedSecret: Uint8Array; ciphertext: Uint8Array }> {
     // Placeholder: Actual ML-KEM encapsulation
     return {
@@ -42,9 +44,10 @@ export class PostQuantumProvider {
   /**
    * Decapsulate with ML-KEM private key
    */
+  // eslint-disable-next-line @typescript-eslint/require-await, require-await -- Placeholder for future async implementation
   async mlkemDecapsulate(
-    privateKey: Uint8Array,
-    ciphertext: Uint8Array
+    _privateKey: Uint8Array,
+    _ciphertext: Uint8Array
   ): Promise<Uint8Array> {
     // Placeholder: Actual ML-KEM decapsulation
     return new Uint8Array(32);
@@ -53,6 +56,7 @@ export class PostQuantumProvider {
   /**
    * Generate ML-DSA signature key pair
    */
+  // eslint-disable-next-line @typescript-eslint/require-await, require-await -- Placeholder for future async implementation
   async generateMLDSAKeyPair(): Promise<QuantumResistantKeyPair> {
     // Placeholder: ML-DSA (Module-Lattice Digital Signature Algorithm)
     return {
@@ -66,9 +70,10 @@ export class PostQuantumProvider {
   /**
    * Sign with ML-DSA private key
    */
+  // eslint-disable-next-line @typescript-eslint/require-await, require-await -- Placeholder for future async implementation
   async mldsaSign(
-    privateKey: Uint8Array,
-    message: Uint8Array
+    _privateKey: Uint8Array,
+    _message: Uint8Array
   ): Promise<Uint8Array> {
     // Placeholder: Actual ML-DSA signature
     return new Uint8Array(3293); // ML-DSA-65 signature size
@@ -77,10 +82,11 @@ export class PostQuantumProvider {
   /**
    * Verify ML-DSA signature
    */
+  // eslint-disable-next-line @typescript-eslint/require-await, require-await -- Placeholder for future async implementation
   async mldsaVerify(
-    publicKey: Uint8Array,
-    message: Uint8Array,
-    signature: Uint8Array
+    _publicKey: Uint8Array,
+    _message: Uint8Array,
+    _signature: Uint8Array
   ): Promise<boolean> {
     // Placeholder: Actual ML-DSA verification
     return true;
@@ -89,6 +95,7 @@ export class PostQuantumProvider {
   /**
    * Generate SLH-DSA key pair (Stateless Hash-Based Signature)
    */
+  // eslint-disable-next-line @typescript-eslint/require-await, require-await -- Placeholder for future async implementation
   async generateSLHDSAKeyPair(): Promise<QuantumResistantKeyPair> {
     // Placeholder: SLH-DSA (Stateless Hash-Based Digital Signature Algorithm)
     return {

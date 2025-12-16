@@ -39,12 +39,13 @@ export class ExternalKeyStoreProvider {
   /**
    * Connect to external key store
    */
+  // eslint-disable-next-line @typescript-eslint/require-await, require-await -- Placeholder for future async implementation
   async connect(): Promise<boolean> {
     try {
       // TODO: Establish HTTPS connection to external KMS
       // Verify TLS certificate if provided
       return true;
-    } catch (error) {
+    } catch {
       return false;
     }
   }
@@ -52,11 +53,12 @@ export class ExternalKeyStoreProvider {
   /**
    * Check connectivity
    */
+  // eslint-disable-next-line @typescript-eslint/require-await, require-await -- Placeholder for future async implementation
   async healthCheck(): Promise<boolean> {
     try {
       // TODO: Send health check request to external key store
       return true;
-    } catch (error) {
+    } catch {
       return false;
     }
   }
@@ -64,6 +66,7 @@ export class ExternalKeyStoreProvider {
   /**
    * Retrieve key from external store
    */
+  // eslint-disable-next-line @typescript-eslint/require-await, require-await -- Placeholder for future async implementation
   async getExternalKey(keyId: string): Promise<Uint8Array> {
     // TODO: Retrieve key material from external HSM
     this.recordAccess(keyId);
@@ -73,9 +76,10 @@ export class ExternalKeyStoreProvider {
   /**
    * Store key in external store
    */
+  // eslint-disable-next-line @typescript-eslint/require-await, require-await -- Placeholder for future async implementation
   async storeExternalKey(
     keyId: string,
-    keyMaterial: Uint8Array
+    _keyMaterial: Uint8Array
   ): Promise<void> {
     // TODO: Store key material in external HSM
     this.recordAccess(keyId);
@@ -84,6 +88,7 @@ export class ExternalKeyStoreProvider {
   /**
    * Delete key from external store
    */
+  // eslint-disable-next-line @typescript-eslint/require-await, require-await -- Placeholder for future async implementation
   async deleteExternalKey(keyId: string): Promise<void> {
     // TODO: Delete key from external HSM
     this.keyCache.delete(keyId);
@@ -92,6 +97,7 @@ export class ExternalKeyStoreProvider {
   /**
    * List keys in external store
    */
+  // eslint-disable-next-line @typescript-eslint/require-await, require-await -- Placeholder for future async implementation
   async listExternalKeys(): Promise<ExternalKeyInfo[]> {
     // TODO: Enumerate keys in external HSM
     return Array.from(this.keyCache.values());
@@ -100,9 +106,10 @@ export class ExternalKeyStoreProvider {
   /**
    * Perform encryption in external store
    */
+  // eslint-disable-next-line @typescript-eslint/require-await, require-await -- Placeholder for future async implementation
   async encryptWithExternalKey(
     keyId: string,
-    plaintext: Uint8Array
+    _plaintext: Uint8Array
   ): Promise<Uint8Array> {
     // TODO: Call external HSM encrypt operation
     this.recordAccess(keyId);
@@ -112,9 +119,10 @@ export class ExternalKeyStoreProvider {
   /**
    * Perform decryption in external store
    */
+  // eslint-disable-next-line @typescript-eslint/require-await, require-await -- Placeholder for future async implementation
   async decryptWithExternalKey(
     keyId: string,
-    ciphertext: Uint8Array
+    _ciphertext: Uint8Array
   ): Promise<Uint8Array> {
     // TODO: Call external HSM decrypt operation
     this.recordAccess(keyId);
@@ -124,9 +132,10 @@ export class ExternalKeyStoreProvider {
   /**
    * Perform signing in external store
    */
+  // eslint-disable-next-line @typescript-eslint/require-await, require-await -- Placeholder for future async implementation
   async signWithExternalKey(
     keyId: string,
-    payload: Uint8Array
+    _payload: Uint8Array
   ): Promise<Uint8Array> {
     // TODO: Call external HSM sign operation
     this.recordAccess(keyId);
@@ -137,7 +146,7 @@ export class ExternalKeyStoreProvider {
    * Record key access for audit
    */
   private recordAccess(keyId: string): void {
-    const info = this.keyCache.get(keyId) || {
+    const info = this.keyCache.get(keyId) ?? {
       keyId,
       location: this.config.endpoint,
       lastAccessedAt: new Date(),
@@ -187,6 +196,7 @@ export class ExternalKeyStoreProvider {
   /**
    * Disconnect from external key store
    */
+  // eslint-disable-next-line @typescript-eslint/require-await, require-await -- Placeholder for future async implementation
   async disconnect(): Promise<void> {
     // TODO: Close HTTPS connection to external KMS
     this.keyCache.clear();

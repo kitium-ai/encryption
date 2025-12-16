@@ -70,7 +70,7 @@ export class JITAccessManager {
       return false;
     }
 
-    const approvers = this.pendingApprovals.get(requestId) || [];
+    const approvers = this.pendingApprovals.get(requestId) ?? [];
     approvers.push(approver);
     this.pendingApprovals.set(requestId, approvers);
 
