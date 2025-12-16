@@ -1,11 +1,12 @@
-import { createCipheriv, createDecipheriv, randomBytes } from 'crypto';
-import { Transform } from 'stream';
+import { createCipheriv, createDecipheriv, randomBytes } from 'node:crypto';
+import { Transform } from 'node:stream';
 
-import { Algorithm } from './types.js';
+import type { Algorithm } from './types.js';
 
 const SUPPORTED: Algorithm[] = ['AES-256-GCM'];
+const AES_256_GCM = 'AES-256-GCM';
 
-export interface StreamingOptions {
+export type StreamingOptions = {
   key: Uint8Array;
   iv?: Uint8Array;
   additionalData?: Uint8Array;
@@ -16,7 +17,7 @@ export function createEncryptionStream(options: StreamingOptions): {
   stream: Transform;
   iv: Uint8Array;
 } {
-  const algorithm = options.algorithm ?? 'AES-256-GCM';
+  const algorithm = options.algorithm ?? AES_256_GCM;
   if (!SUPPORTED.includes(algorithm)) {
     throw new Error(`Unsupported streaming algorithm ${algorithm}`);
   }
@@ -25,24 +26,31 @@ export function createEncryptionStream(options: StreamingOptions): {
   if (options.additionalData) {
     cipher.setAAD(Buffer.from(options.additionalData));
   }
+   
   const stream = new Transform({
+    // eslint-disable-next-line promise/prefer-await-to-callbacks
     transform(chunk, _encoding, callback) {
       try {
         const data = cipher.update(chunk as Buffer);
+        // eslint-disable-next-line promise/prefer-await-to-callbacks
         callback(null, data);
-      } catch (err) {
-        callback(err as Error);
+      } catch (error) {
+        // eslint-disable-next-line promise/prefer-await-to-callbacks
+        callback(error as Error);
       }
     },
+    // eslint-disable-next-line promise/prefer-await-to-callbacks
     flush(callback) {
       try {
         const finalChunk = cipher.final();
         const tag = cipher.getAuthTag();
         this.push(finalChunk);
         this.push(tag);
+        // eslint-disable-next-line promise/prefer-await-to-callbacks
         callback();
-      } catch (err) {
-        callback(err as Error);
+      } catch (error) {
+        // eslint-disable-next-line promise/prefer-await-to-callbacks
+        callback(error as Error);
       }
     },
   });
@@ -52,7 +60,7 @@ export function createEncryptionStream(options: StreamingOptions): {
 export function createDecryptionStream(
   options: StreamingOptions & { authTag: Uint8Array }
 ): Transform {
-  const algorithm = options.algorithm ?? 'AES-256-GCM';
+  const algorithm = options.algorithm ?? AES_256_GCM;
   if (!SUPPORTED.includes(algorithm)) {
     throw new Error(`Unsupported streaming algorithm ${algorithm}`);
   }
@@ -61,22 +69,29 @@ export function createDecryptionStream(
     decipher.setAAD(Buffer.from(options.additionalData));
   }
   decipher.setAuthTag(Buffer.from(options.authTag));
+   
   return new Transform({
+    // eslint-disable-next-line promise/prefer-await-to-callbacks
     transform(chunk, _encoding, callback) {
       try {
         const data = decipher.update(chunk as Buffer);
+        // eslint-disable-next-line promise/prefer-await-to-callbacks
         callback(null, data);
-      } catch (err) {
-        callback(err as Error);
+      } catch (error) {
+        // eslint-disable-next-line promise/prefer-await-to-callbacks
+        callback(error as Error);
       }
     },
+    // eslint-disable-next-line promise/prefer-await-to-callbacks
     flush(callback) {
       try {
         const finalChunk = decipher.final();
         this.push(finalChunk);
+        // eslint-disable-next-line promise/prefer-await-to-callbacks
         callback();
-      } catch (err) {
-        callback(err as Error);
+      } catch (error) {
+        // eslint-disable-next-line promise/prefer-await-to-callbacks
+        callback(error as Error);
       }
     },
   });

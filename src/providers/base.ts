@@ -1,4 +1,4 @@
-import {
+import type {
   AuditEvent,
   DecryptionRequest,
   EncryptionRequest,
@@ -10,7 +10,7 @@ import {
   VerificationRequest,
 } from '../types.js';
 
-export interface EncryptionProvider {
+export type EncryptionProvider = {
   readonly name: string;
   encrypt(request: EncryptionRequest): Promise<EncryptionResult>;
   decrypt(request: DecryptionRequest): Promise<Uint8Array>;

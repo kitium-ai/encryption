@@ -1,29 +1,31 @@
-import crypto from 'crypto';
+import crypto from 'node:crypto';
 
-import {
-  AuditEvent,
+import { UnsupportedAlgorithmError } from '../errors.js';
+import type {
   Algorithm,
+  AuditEvent,
   DecryptionRequest,
   EncryptionRequest,
   EncryptionResult,
+  HealthCheck,
   KeyMetadata,
   SignatureRequest,
   SignatureResult,
   VerificationRequest,
 } from '../types.js';
-import { EncryptionProvider } from './base.js';
 import { generateNonce, zeroize } from '../utils/crypto.js';
-import { PolicyChecker } from '../utils/policy.js';
-import { UnsupportedAlgorithmError } from '../errors.js';
+import type { PolicyChecker } from '../utils/policy.js';
+import type { EncryptionProvider } from './base.js';
 
 const SUPPORTED_ENCRYPTION: Algorithm[] = ['AES-256-GCM'];
 const SUPPORTED_SIGNING: Algorithm[] = ['ED25519'];
+const AES_256_GCM = 'AES-256-GCM';
 
-export interface LocalProviderOptions {
+export type LocalProviderOptions = {
   defaultEncryptionKeyId?: string;
   auditSink?: (event: AuditEvent) => void | Promise<void>;
   policyChecker?: PolicyChecker;
-}
+};
 
 export class LocalEncryptionProvider implements EncryptionProvider {
   readonly name = 'local';
@@ -50,7 +52,7 @@ export class LocalEncryptionProvider implements EncryptionProvider {
   async encrypt(request: EncryptionRequest): Promise<EncryptionResult> {
     this.policyChecker?.enforce('encrypt', { keyId: request.keyId ?? this.encryptionKeyId });
     const keyId = request.keyId ?? this.encryptionKeyId;
-    const algorithm = request.algorithm ?? 'AES-256-GCM';
+    const algorithm = request.algorithm ?? AES_256_GCM;
     if (!SUPPORTED_ENCRYPTION.includes(algorithm)) {
       throw new UnsupportedAlgorithmError(`Algorithm ${algorithm} not supported for encryption`);
     }
@@ -91,7 +93,7 @@ export class LocalEncryptionProvider implements EncryptionProvider {
   async decrypt(request: DecryptionRequest): Promise<Uint8Array> {
     this.policyChecker?.enforce('decrypt', { keyId: request.keyId ?? this.encryptionKeyId });
     const keyId = request.keyId ?? this.encryptionKeyId;
-    const algorithm = request.algorithm ?? 'AES-256-GCM';
+    const algorithm = request.algorithm ?? AES_256_GCM;
     if (!SUPPORTED_ENCRYPTION.includes(algorithm)) {
       throw new UnsupportedAlgorithmError(`Algorithm ${algorithm} not supported for decryption`);
     }
@@ -191,7 +193,7 @@ export class LocalEncryptionProvider implements EncryptionProvider {
     if (!publicKeyPem) {
       return false;
     }
-    const result = crypto.verify(
+    const isValid = crypto.verify(
       null,
       Buffer.from(request.payload),
       publicKeyPem,
@@ -203,9 +205,9 @@ export class LocalEncryptionProvider implements EncryptionProvider {
       keyId,
       metadata: { algorithm },
       timestamp: new Date(),
-      success: result,
+      success: isValid,
     });
-    return result;
+    return isValid;
   }
 
   async generateKey(): Promise<KeyMetadata> {
@@ -221,7 +223,7 @@ export class LocalEncryptionProvider implements EncryptionProvider {
     });
     return {
       keyId,
-      algorithm: 'AES-256-GCM',
+      algorithm: AES_256_GCM,
       createdAt: new Date(),
       managedBy: 'local',
     };
@@ -239,32 +241,32 @@ export class LocalEncryptionProvider implements EncryptionProvider {
     });
     return {
       keyId,
-      algorithm: 'AES-256-GCM',
+      algorithm: AES_256_GCM,
       createdAt: new Date(),
       managedBy: 'local',
       version: crypto.randomUUID(),
     };
   }
 
-  async getKeyMetadata(keyId: string): Promise<KeyMetadata> {
-    const exists = this.keys.has(keyId);
-    if (!exists) {
+  getKeyMetadata(keyId: string): Promise<KeyMetadata> {
+    const hasKey = this.keys.has(keyId);
+    if (!hasKey) {
       throw new Error(`Unknown key ${keyId}`);
     }
-    return {
+    return Promise.resolve({
       keyId,
-      algorithm: 'AES-256-GCM',
+      algorithm: AES_256_GCM,
       createdAt: new Date(),
       managedBy: 'local',
-    };
+    });
   }
 
-  async healthCheck() {
-    return {
+  healthCheck(): Promise<HealthCheck> {
+    return Promise.resolve({
       provider: this.name,
       healthy: true,
       latencyMs: 1,
       details: 'local crypto provider ready',
-    };
+    });
   }
 }

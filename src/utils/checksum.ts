@@ -1,4 +1,4 @@
-import crypto from 'crypto';
+import crypto from 'node:crypto';
 
 export function checksum(input: string | Uint8Array): string {
   const hash = crypto.createHash('sha256');

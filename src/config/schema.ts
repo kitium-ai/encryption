@@ -12,12 +12,12 @@ export const providerConfigSchema = z.object({
 
 export type ProviderConfig = z.infer<typeof providerConfigSchema>;
 
-export function loadConfig(fromEnv = process.env): ProviderConfig {
+export function loadConfig(fromEnvironment = process.env): ProviderConfig {
   return providerConfigSchema.parse({
-    provider: fromEnv.ENCRYPTION_PROVIDER as ProviderConfig['provider'],
-    defaultKeyId: fromEnv.ENCRYPTION_KEY_ID,
-    fipsMode: fromEnv.ENCRYPTION_FIPS === 'true',
-    auditEnabled: fromEnv.ENCRYPTION_AUDIT !== 'false',
-    cacheTtlMs: fromEnv.ENCRYPTION_CACHE_TTL ? Number(fromEnv.ENCRYPTION_CACHE_TTL) : undefined,
+    provider: fromEnvironment.ENCRYPTION_PROVIDER as ProviderConfig['provider'],
+    defaultKeyId: fromEnvironment.ENCRYPTION_KEY_ID,
+    fipsMode: fromEnvironment.ENCRYPTION_FIPS === 'true',
+    auditEnabled: fromEnvironment.ENCRYPTION_AUDIT !== 'false',
+    cacheTtlMs: fromEnvironment.ENCRYPTION_CACHE_TTL ? Number(fromEnvironment.ENCRYPTION_CACHE_TTL) : undefined,
   });
 }

@@ -1,12 +1,17 @@
-import baseConfig from '@kitiumai/config/eslint.config.base.js';
+import { baseConfig, securityConfig, typeScriptConfig } from '@kitiumai/lint/eslint';
 
 export default [
-  ...baseConfig,
   {
+    ignores: ['dist/', 'node_modules/', 'coverage/', '.husky/', '**/*.d.ts'],
+  },
+  ...baseConfig,
+  ...typeScriptConfig,
+  securityConfig,
+  {
+    name: 'schemas/overrides',
     rules: {
-      '@typescript-eslint/no-explicit-any': 'off',
-      '@typescript-eslint/explicit-function-return-type': 'off',
-      'no-restricted-imports': 'off',
+      'security/detect-object-injection': 'off',
+      'no-restricted-imports': 'off'
     },
   },
 ];

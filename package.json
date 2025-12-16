@@ -1,33 +1,114 @@
 {
   "name": "@kitiumai/encryption",
-  "version": "1.0.0",
-  "description": "Enterprise-ready TypeScript encryption SDK with pluggable providers and secure defaults.",
+  "version": "2.0.0",
+  "description": "TypeScript encryption SDK for Node.js and browsers with AES-256-GCM + Ed25519, envelope encryption, pluggable providers (local/KMS/HSM), and built-in audit/policy hooks.",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "module": "dist/index.js",
   "sideEffects": false,
+  "files": [
+    "dist/**/*",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md",
+    "SECURITY.md"
+  ],
   "exports": {
     ".": {
       "import": "./dist/index.js",
       "types": "./dist/index.d.ts"
-    }
+    },
+    "./audit": {
+      "import": "./dist/audit.js",
+      "types": "./dist/audit.d.ts"
+    },
+    "./envelope": {
+      "import": "./dist/envelope.js",
+      "types": "./dist/envelope.d.ts"
+    },
+    "./errors": {
+      "import": "./dist/errors.js",
+      "types": "./dist/errors.d.ts"
+    },
+    "./helpers": {
+      "import": "./dist/helpers.js",
+      "types": "./dist/helpers.d.ts"
+    },
+    "./streaming": {
+      "import": "./dist/streaming.js",
+      "types": "./dist/streaming.d.ts"
+    },
+    "./types": {
+      "import": "./dist/types.js",
+      "types": "./dist/types.d.ts"
+    },
+    "./config/schema": {
+      "import": "./dist/config/schema.js",
+      "types": "./dist/config/schema.d.ts"
+    },
+    "./interfaces/*": {
+      "import": "./dist/interfaces/*.js",
+      "types": "./dist/interfaces/*.d.ts"
+    },
+    "./providers/local": {
+      "import": "./dist/providers/local/index.js",
+      "types": "./dist/providers/local/index.d.ts"
+    },
+    "./providers/*": {
+      "import": "./dist/providers/*.js",
+      "types": "./dist/providers/*.d.ts"
+    },
+    "./providers/local/*": {
+      "import": "./dist/providers/local/*.js",
+      "types": "./dist/providers/local/*.d.ts"
+    },
+    "./strategies/*": {
+      "import": "./dist/strategies/*.js",
+      "types": "./dist/strategies/*.d.ts"
+    },
+    "./decorators/*": {
+      "import": "./dist/decorators/*.js",
+      "types": "./dist/decorators/*.d.ts"
+    },
+    "./utils/*": {
+      "import": "./dist/utils/*.js",
+      "types": "./dist/utils/*.d.ts"
+    },
+    "./features/*": {
+      "import": "./dist/features/*.js",
+      "types": "./dist/features/*.d.ts"
+    },
+    "./package.json": "./package.json"
   },
   "keywords": [
     "encryption",
+    "cryptography",
     "crypto",
-    "aes-gcm",
-    "ed25519",
-    "kms",
-    "key management",
-    "envelope encryption",
-    "argon2",
-    "scrypt",
     "typescript",
     "sdk",
-    "security",
+    "node",
+    "browser",
+    "aes-gcm",
+    "aes-256-gcm",
+    "aead",
+    "envelope-encryption",
+    "ed25519",
+    "kms",
+    "aws-kms",
+    "gcp-kms",
+    "azure-key-vault",
+    "hashicorp-vault",
+    "hsm",
+    "key-management",
+    "key rotation",
+    "audit",
+    "compliance",
+    "policy",
+    "argon2",
+    "scrypt",
     "webcrypto",
-    "node crypto",
+    "security",
     "kitium",
     "kitiumai"
   ],
@@ -41,12 +122,12 @@
   "homepage": "https://github.com/kitium-ai/encryption#readme",
   "scripts": {
     "build": "tsc --noEmit false",
-    "lint": "eslint \"src/**/*.{ts,tsx}\"",
+    "lint": "eslint \"src\" --ext .ts,.tsx",
     "format": "prettier --write \"src/**/*.{ts,tsx}\"",
     "test": "vitest run",
     "check": "npm run lint && npm run test",
     "typecheck": "tsc -b --noEmit",
-    "lint:fix": "eslint . --fix",
+    "lint:fix": "eslint \"src\" --ext .ts,.tsx --fix",
     "lint:all": "node --input-type=module -e \"import { lintAll } from '@kitiumai/scripts/lint'; await lintAll(false);\"",
     "test:watch": "vitest watch",
     "test:coverage": "node --input-type=module -e \"import { runTestsCoverage } from '@kitiumai/scripts/test'; await runTestsCoverage();\"",
@@ -69,19 +150,21 @@
   },
   "license": "MIT",
   "devDependencies": {
-    "@types/node": "^22.5.4",
-    "eslint": "^9.9.0",
-    "eslint-config-prettier": "^9.1.0",
+    "@kitiumai/config": "^3.1.4",
+    "@kitiumai/lint": "^3.0.1",
+    "@kitiumai/scripts": "^2.0.0",
+    "@kitiumai/vitest-helpers": "^3.0.0",
+    "@types/node": "^24.10.1",
+    "@vitest/coverage-v8": "^2.1.8",
+    "eslint": "^9.15.0",
+    "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-import": "^2.29.1",
     "eslint-plugin-promise": "^6.2.0",
-    "prettier": "^3.3.3",
-    "typescript": "^5.5.4",
-    "vitest": "^1.6.0",
-    "zod": "^3.23.8",
-    "@kitiumai/vitest-helpers": "^2.0.1",
-    "@kitiumai/lint": "^2.0.1",
-    "@kitiumai/scripts": "^1.0.0",
-    "@kitiumai/config": "^2.0.1"
+    "husky": "^9.1.7",
+    "prettier": "^3.6.2",
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.8",
+    "zod": "^3.23.8"
   },
   "dependencies": {
     "argon2-browser": "^1.18.0"

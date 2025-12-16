@@ -1,32 +1,76 @@
+/**
+ * Base encryption error class
+ * All encryption-related errors extend this class
+ */
 export class EncryptionError extends Error {
   readonly code: string;
+  readonly context?: Record<string, unknown>;
+  readonly correlationId?: string;
 
-  constructor(message: string, code = 'ENCRYPTION_ERROR') {
+  constructor(
+    message: string,
+    code = 'ENCRYPTION_ERROR',
+    context?: { correlationId?: string; [key: string]: unknown }
+  ) {
     super(message);
     this.code = code;
+    this.correlationId = context?.correlationId;
+    this.context = context;
+    this.name = 'EncryptionError';
   }
 }
 
-export class PolicyViolationError extends Error {
-  readonly code = 'POLICY_VIOLATION';
-
-  constructor(message: string) {
-    super(message);
+/**
+ * Policy violation error
+ * Thrown when a policy check fails
+ */
+export class PolicyViolationError extends EncryptionError {
+  constructor(message: string, context?: Record<string, unknown>) {
+    super(message, 'POLICY_VIOLATION', context);
+    this.name = 'PolicyViolationError';
   }
 }
 
-export class UnsupportedAlgorithmError extends Error {
-  readonly code = 'UNSUPPORTED_ALGORITHM';
-
-  constructor(message: string) {
-    super(message);
+/**
+ * Unsupported algorithm error
+ * Thrown when an algorithm is not supported by the provider
+ */
+export class UnsupportedAlgorithmError extends EncryptionError {
+  constructor(message: string, context?: Record<string, unknown>) {
+    super(message, 'UNSUPPORTED_ALGORITHM', context);
+    this.name = 'UnsupportedAlgorithmError';
   }
 }
 
-export class AuditSinkError extends Error {
-  readonly code = 'AUDIT_SINK_ERROR';
+/**
+ * Audit sink error
+ * Thrown when an audit sink fails to record an event
+ */
+export class AuditSinkError extends EncryptionError {
+  constructor(message: string, context?: Record<string, unknown>) {
+    super(message, 'AUDIT_SINK_ERROR', context);
+    this.name = 'AuditSinkError';
+  }
+}
 
-  constructor(message: string) {
-    super(message);
+/**
+ * Key not found error
+ * Thrown when a requested key is not available
+ */
+export class KeyNotFoundError extends EncryptionError {
+  constructor(keyId: string, context?: Record<string, unknown>) {
+    super(`Key not found: ${keyId}`, 'KEY_NOT_FOUND', { ...context, keyId });
+    this.name = 'KeyNotFoundError';
+  }
+}
+
+/**
+ * Circuit breaker open error
+ * Thrown when circuit breaker is open and rejecting requests
+ */
+export class CircuitBreakerOpenError extends EncryptionError {
+  constructor(message: string, context?: Record<string, unknown>) {
+    super(message, 'CIRCUIT_BREAKER_OPEN', context);
+    this.name = 'CircuitBreakerOpenError';
   }
 }

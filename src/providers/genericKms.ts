@@ -1,8 +1,6 @@
-import { setTimeout as delay } from 'timers/promises';
+import { setTimeout as delay } from 'node:timers/promises';
 
-import { EncryptionProvider } from './base.js';
-import { LocalEncryptionProvider } from './local.js';
-import {
+import type {
   DecryptionRequest,
   EncryptionRequest,
   EncryptionResult,
@@ -12,13 +10,15 @@ import {
   SignatureResult,
   VerificationRequest,
 } from '../types.js';
+import type { EncryptionProvider } from './base.js';
+import { LocalEncryptionProvider } from './local.js';
 
 export type KmsFlavor = 'aws-kms' | 'gcp-kms' | 'azure-keyvault' | 'vault-transit';
 
-export interface GenericKmsOptions {
+export type GenericKmsOptions = {
   flavor: KmsFlavor;
   latencyMs?: number;
-}
+};
 
 export class GenericKmsProvider implements EncryptionProvider {
   readonly name: string;
@@ -31,7 +31,7 @@ export class GenericKmsProvider implements EncryptionProvider {
     this.latencyMs = options.latencyMs ?? 5;
   }
 
-  private async jitter() {
+  private async jitter(): Promise<void> {
     await delay(this.latencyMs);
   }
 

@@ -3,9 +3,12 @@ export type Algorithm =
   | 'CHACHA20-POLY1305'
   | 'ED25519'
   | 'ECDSA-P256'
-  | 'RSA-OAEP-256';
+  | 'RSA-OAEP-256'
+  | 'ML-KEM'
+  | 'ML-DSA'
+  | 'SLH-DSA';
 
-export interface EncryptionRequest {
+export type EncryptionRequest = {
   plaintext: Uint8Array;
   additionalData?: Uint8Array;
   keyId?: string;
@@ -13,7 +16,7 @@ export interface EncryptionRequest {
   abortSignal?: AbortSignal;
 }
 
-export interface EncryptionResult {
+export type EncryptionResult = {
   ciphertext: Uint8Array;
   iv: Uint8Array;
   authTag?: Uint8Array;
@@ -22,7 +25,7 @@ export interface EncryptionResult {
   additionalData?: Uint8Array;
 }
 
-export interface DecryptionRequest {
+export type DecryptionRequest = {
   ciphertext: Uint8Array;
   iv: Uint8Array;
   authTag?: Uint8Array;
@@ -32,42 +35,42 @@ export interface DecryptionRequest {
   abortSignal?: AbortSignal;
 }
 
-export interface SignatureRequest {
+export type SignatureRequest = {
   payload: Uint8Array;
   keyId?: string;
   algorithm?: Algorithm;
   abortSignal?: AbortSignal;
 }
 
-export interface SignatureResult {
+export type SignatureResult = {
   signature: Uint8Array;
   keyId: string;
   algorithm: Algorithm;
   publicKey?: Uint8Array;
 }
 
-export interface VerificationRequest extends SignatureRequest {
+export type VerificationRequest = {
   signature: Uint8Array;
-}
+} & SignatureRequest
 
-export interface KeyMetadata {
+export type KeyMetadata = {
   keyId: string;
   algorithm: Algorithm;
   createdAt: Date;
   expiresAt?: Date;
   version?: string;
-  managedBy: 'local' | 'aws-kms' | 'gcp-kms' | 'azure-keyvault' | 'vault-transit';
+  managedBy: 'local' | 'aws-kms' | 'gcp-kms' | 'azure-keyvault' | 'vault-transit' | 'hsm' | 'external-kms';
   labels?: Record<string, string>;
 }
 
-export interface HealthCheck {
+export type HealthCheck = {
   provider: string;
   healthy: boolean;
   latencyMs?: number;
   details?: string;
 }
 
-export interface DataKey {
+export type DataKey = {
   key: Uint8Array;
   keyId: string;
   algorithm: Algorithm;
@@ -80,9 +83,13 @@ export type AuditEventType =
   | 'verify'
   | 'generateKey'
   | 'rotateKey'
-  | 'health';
+  | 'health'
+  | 'softDelete'
+  | 'restore'
+  | 'backup'
+  | 'threat';
 
-export interface AuditEvent {
+export type AuditEvent = {
   type: AuditEventType;
   provider: string;
   keyId?: string;

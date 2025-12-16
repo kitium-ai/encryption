@@ -1,22 +1,23 @@
-import { AuditEvent } from './types.js';
 import { AuditSinkError } from './errors.js';
+import type { AuditEvent } from './types.js';
 
-export interface AuditSink {
+export type AuditSink = {
   record(event: AuditEvent): Promise<void>;
 }
 
 export class ConsoleAuditSink implements AuditSink {
-  async record(event: AuditEvent): Promise<void> {
-    // eslint-disable-next-line no-console
-    console.info(JSON.stringify({ level: 'info', ...event }));
+  record(event: AuditEvent): Promise<void> {
+
+    return Promise.resolve(console.info(JSON.stringify({ level: 'info', ...event })));
   }
 }
 
 export class BufferedAuditSink implements AuditSink {
   private readonly events: AuditEvent[] = [];
 
-  async record(event: AuditEvent): Promise<void> {
+  record(event: AuditEvent): Promise<void> {
     this.events.push(event);
+    return Promise.resolve();
   }
 
   flush(): AuditEvent[] {
@@ -33,13 +34,13 @@ export class CompositeAuditSink implements AuditSink {
       this.sinks.map(async (sink) => {
         try {
           await sink.record(event);
-        } catch (err) {
-          errors.push(err as Error);
+        } catch (error) {
+          errors.push(error as Error);
         }
       })
     );
     if (errors.length > 0) {
-      throw new AuditSinkError(`Audit sink failures: ${errors.map((e) => e.message).join(', ')}`);
+      throw new AuditSinkError(`Audit sink failures: ${errors.map((error_) => error_.message).join(', ')}`);
     }
   }
 }

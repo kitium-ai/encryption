@@ -1,7 +1,7 @@
-import { TextEncoder, TextDecoder } from 'util';
+import { TextDecoder,TextEncoder } from 'node:util';
 
-import { EncryptionProvider } from './providers/base.js';
-import {
+import type { EncryptionProvider } from './providers/base.js';
+import type {
   DecryptionRequest,
   EncryptionRequest,
   EncryptionResult,
@@ -12,7 +12,7 @@ import {
 const encoder = new TextEncoder();
 const decoder = new TextDecoder();
 
-export async function encryptString(
+export function encryptString(
   provider: EncryptionProvider,
   input: string,
   options: Omit<EncryptionRequest, 'plaintext'>
@@ -28,7 +28,7 @@ export async function decryptToString(
   return decoder.decode(plaintext);
 }
 
-export async function encryptJson<T>(
+export function encryptJson<T>(
   provider: EncryptionProvider,
   value: T,
   options: Omit<EncryptionRequest, 'plaintext'>
@@ -45,7 +45,7 @@ export async function decryptJson<T>(
   return JSON.parse(decoder.decode(plaintext)) as T;
 }
 
-export async function signPayload(
+export function signPayload(
   provider: EncryptionProvider,
   payload: Uint8Array,
   options: Omit<SignatureRequest, 'payload'>

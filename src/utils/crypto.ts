@@ -1,4 +1,4 @@
-import crypto from 'crypto';
+import crypto from 'node:crypto';
 
 export function generateNonce(size: number): Uint8Array {
   return crypto.randomBytes(size);
@@ -19,17 +19,17 @@ export function randomBytes(size: number): Uint8Array {
   return crypto.randomBytes(size);
 }
 
-export async function deriveKeyScrypt(
+export function deriveKeyScrypt(
   password: string,
   salt: Uint8Array,
   keyLength = 32
 ): Promise<Uint8Array> {
   return new Promise((resolve, reject) => {
     // Node scrypt options keys are uppercase by API; keep as-is
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    crypto.scrypt(password, salt, keyLength, { N: 16384, r: 8, p: 1 }, (err, derivedKey) => {
-      if (err) {
-        reject(err);
+    // eslint-disable-next-line promise/prefer-await-to-callbacks
+    crypto.scrypt(password, salt, keyLength, { N: 16384, r: 8, p: 1 }, (error, derivedKey) => {
+      if (error) {
+        reject(error);
       } else {
         resolve(new Uint8Array(derivedKey as Buffer));
       }
@@ -43,7 +43,7 @@ export async function deriveKeyArgon2id(
   options?: { iterations?: number; memory?: number }
 ): Promise<Uint8Array> {
   const { hash } = await import('argon2-browser');
-  const res = await hash({
+  const result = await hash({
     pass: password,
     salt,
     type: 2,
@@ -51,5 +51,5 @@ export async function deriveKeyArgon2id(
     mem: options?.memory ?? 65536,
     hashLen: 32,
   });
-  return new Uint8Array(res.hash);
+  return new Uint8Array(result.hash);
 }
